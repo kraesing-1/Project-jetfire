@@ -1,0 +1,4 @@
+DEPENDENCIES = {"pandas == 2.3.0",
+                "numpy == 2.3.1",
+                "seaborn == 0.13.2",
+                "matplotlib == 3.10.3"}

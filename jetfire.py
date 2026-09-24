@@ -19,10 +19,6 @@ def change_dir():
     """ Change directory to current working directory """
     os.chdir(os.getcwd())
 
-#os.chdir(r"Y:\BSSH_project\DRAGEN TruSight Oncology 500 v2_6_2_4_ds.ee24f1e982424c32861d4815a86b17ec\Logs_Intermediates\Gis\FFPE_colon_tissue1_rep2_dna")
-
-#os.chdir(r"Y:\BSSH_project\DRAGEN TruSight Oncology 500 v2_6_2_4_ds.ee24f1e982424c32861d4815a86b17ec\Logs_Intermediates")
-
 def create_path_files():
     """ Get full path to b-allele files for data ingestion
     :return List of b-allele file paths"""

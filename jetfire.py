@@ -7,6 +7,7 @@ import seaborn as sns
 import os
 import pandas as pd
 import numpy as np
+import itertools
 
 # Set seaborn configurations
 sns.set_theme()
@@ -77,33 +78,43 @@ def b_allele_plotting(df, list_with_chromosomes, label_positions, sample_name, l
     :param sample_name: sample name
     :return: SVG figure plot saved to directory containing bAllelel.tsv files"""
 
-    fig, axs = plt.subplots(figsize=(15, 8), nrows=1)
+    fig, axs = plt.subplots(nrows=1, ncols=len(list_with_chromosomes), figsize=(10, 2))
+    fig.subplots_adjust(wspace=0)
 
-    # Scatter plot creation
-    for chr in list_with_chromosomes:
-        sns.scatterplot(data=df.loc[df["Chromosome"] == chr], x="Global_position", y="BAF")
+    palette = itertools.cycle(sns.color_palette())
 
-    # Title fitting
-    axs.set_title("Sample: " + df["sample"].unique()[0], fontsize=16)
+    for idx, chr in enumerate(list_with_chromosomes):
 
-    # xticks fitting
-    axs.set_xlabel('Chromosome', fontsize=15)
-    axs.set_xticks(label_positions)
-    axs.set_xticklabels([i.title() for i in list_with_chromosomes], rotation=80)
+        df = df_test.loc[df_test["Chromosome"] == chr]
 
-    # yticks fitting
-    axs.set_ylabel('B-Allele Frequency', fontsize=15)
-    axs.set_yticks(np.arange(0, 1.1, 0.1))
+        sns.scatterplot(data=df, x="Position", y="BAF",
+                        ax=axs[idx],
+                        color=palette.__next__(),
+                        s=20)
 
-    # overall fitting
-    axs.tick_params(axis='both', which='major', labelsize=12)
-    axs.set_xlim(-75, df.__len__() + 75)
+        axs[idx].set_yticks([])
+        axs[idx].spines['right'].set_visible(False)
+        axs[idx].spines['left'].set_visible(False)
+        #axs[idx].set_xlim(0, df["Position"].max()+10000)
 
-    # Introduce a horizontal line for every 0.1 step on the y-axis.
-    for i in np.arange(0.1,1,0.1):
-        axs.axhline(y=i, linestyle="solid", color="grey", alpha=0.1)
+        # Y-axis and y-label fitting
+        fig.supylabel('BAF', fontsize=15)
+        #axs[idx].get_yaxis().set_visible(False)
+        axs[idx].set_ylim(-0.02, 1.02)
+        axs[idx].set(ylabel=None)
+        for i in np.arange(0, 1.1, 0.1):
+            axs[idx].axhline(y=i, linestyle="solid", color="grey", alpha=0.1)
 
-    plt.tight_layout()
+        # X-axis and x-label fitting
+        fig.supxlabel('Chromosome', fontsize=15)
+        axs[idx].set(xlabel=None)
+        axs[idx].set_xticks([np.median(df["Position"])])
+        axs[idx].set_xticklabels([chr.title()], rotation=80)
+
+    axs[0].set_yticks(np.arange(0, 1.1, 0.1))
+    axs[0].spines['left'].set_visible(True)
+    axs[-1].spines['right'].set_visible(True)
+    fig.suptitle("Sample: " + df["sample"].unique()[0], fontsize=16, fontweight="bold", y=0.90)
 
     fig.savefig(f'{sample_name}_b-allele.svg', dpi=300, bbox_inches='tight', format="svg")
 
@@ -115,7 +126,6 @@ def rolling():
     file_path = create_path_files()
 
     # Create dataframes for the b-allele files.
-    dfs_b_allele = []
     for b_allele_file, i in zip(file_path, range(len(file_path))):
        sample_name = b_allele_file.split("\\")[-1].split("_bAllele")[0]
        #print(f"Processing {sample_name}")
